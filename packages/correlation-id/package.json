@@ -1,0 +1,45 @@
+{
+  "name": "@nestified/correlation-id",
+  "version": "1.0.0",
+  "description": "A NestJS package for adding correlation IDs to requests for tracking and logging",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "lint": "eslint src --ext .ts",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "nestjs",
+    "correlation-id",
+    "request-tracking",
+    "logging"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "dependencies": {
+    "@nestjs/common": "^10.0.0",
+    "@types/express": "^5.0.3",
+    "express": "^5.1.0"
+  },
+  "devDependencies": {
+    "@nestjs/testing": "^10.0.0",
+    "@types/node": "^20.14.10",
+    "@typescript-eslint/eslint-plugin": "^7.16.0",
+    "@typescript-eslint/parser": "^7.16.0",
+    "eslint": "^8.57.0",
+    "typescript": "^5.5.3",
+    "vitest": "^2.0.5"
+  },
+  "peerDependencies": {
+    "@nestjs/core": "^10.0.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
