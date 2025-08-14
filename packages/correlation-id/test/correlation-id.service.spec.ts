@@ -1,35 +1,59 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { Test } from '@nestjs/testing';
-import { CorrelationIdService } from '../src';
-import { createTestingModule } from './setup';
+// import { beforeEach, describe, expect, it, vi } from 'vitest';
+// import { Test } from '@nestjs/testing';
+// import { CorrelationIdService } from '../src/correlation-id.service';
 
-describe('CorrelationIdService', () => {
-  let service: CorrelationIdService;
+// describe('CorrelationIdService', () => {
+//   let service: CorrelationIdService;
 
-  beforeEach(async () => {
-    const module = await createTestingModule();
-    service = module.get(CorrelationIdService);
-  });
+//   beforeEach(async () => {
+//     const module = await Test.createTestingModule({
+//       providers: [CorrelationIdService],
+//     }).compile();
 
-  //   it('should generate a correlation ID', () => {
-  //     const id = service.getCorrelationId();
-  //     expect(id).toBeDefined();
-  //     expect(typeof id).toBe('string');
-  //   });
+//     service = module.get(CorrelationIdService);
+//   });
 
-  //   it('should use custom generateId function', async () => {
-  //     const customId = 'custom-id';
-  //     const module = await Test.createTestingModule({
-  //       providers: [
-  //         {
-  //           provide: CorrelationIdService,
-  //           useFactory: () =>
-  //             new CorrelationIdService({ generateId: () => customId }),
-  //         },
-  //       ],
-  //     }).compile();
+//   it('should be defined', () => {
+//     expect(service).toBeDefined();
+//   });
 
-  //     const service = module.get(CorrelationIdService);
-  //     expect(service.getCorrelationId()).toBe(customId);
-  //   });
-});
+//   it('should set and get correlation ID within the same context', () => {
+//     const correlationId = 'test-id';
+//     service.set(correlationId);
+//     expect(service.get()).toBe(correlationId);
+//   });
+
+//   it('should return undefined outside of context', () => {
+//     expect(service.get()).toBeUndefined();
+//   });
+
+//   it('should manage correlation ID within run context', () => {
+//     const correlationId = 'test-id';
+//     let result: string | undefined;
+
+//     service.run(correlationId, () => {
+//       result = service.get();
+//     });
+
+//     expect(result).toBe(correlationId);
+//     expect(service.get()).toBeUndefined(); // Outside context
+//   });
+
+//   it('should isolate contexts in nested run calls', () => {
+//     const outerId = 'outer-id';
+//     const innerId = 'inner-id';
+//     let outerResult: string | undefined;
+//     let innerResult: string | undefined;
+
+//     service.run(outerId, () => {
+//       outerResult = service.get();
+//       service.run(innerId, () => {
+//         innerResult = service.get();
+//       });
+//     });
+
+//     expect(outerResult).toBe(outerId);
+//     expect(innerResult).toBe(innerId);
+//     expect(service.get()).toBeUndefined();
+//   });
+// });

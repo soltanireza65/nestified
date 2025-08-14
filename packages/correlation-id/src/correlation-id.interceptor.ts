@@ -3,11 +3,11 @@ import {
   ExecutionContext,
   Injectable,
   NestInterceptor,
-} from "@nestjs/common";
-import { Observable } from "rxjs";
-import { CorrelationIdService } from "./correlation-id.service";
-import { CORRELATION_ID_HEADER } from "./correlation-id.constants";
-import { randomUUID } from "crypto";
+} from '@nestjs/common';
+import { Observable } from 'rxjs';
+import { CorrelationIdService } from './correlation-id.service';
+import { CORRELATION_ID_HEADER } from './correlation-id.constants';
+import { randomUUID } from 'crypto';
 
 @Injectable()
 export class CorrelationIdInterceptor implements NestInterceptor {
@@ -17,12 +17,12 @@ export class CorrelationIdInterceptor implements NestInterceptor {
     const type = context.getType();
     let id: string | undefined;
 
-    if (type === "rpc") {
+    if (type === 'rpc') {
       const ctx = context.switchToRpc();
       const data = ctx.getData();
       const headers = (data?.headers || {}) as Record<string, string>;
       id = headers[CORRELATION_ID_HEADER] || randomUUID();
-    } else if (type === "ws") {
+    } else if (type === 'ws') {
       const client = context.switchToWs().getClient();
       id = client?.handshake?.headers?.[CORRELATION_ID_HEADER];
     }

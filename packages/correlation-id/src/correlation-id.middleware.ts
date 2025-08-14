@@ -1,7 +1,7 @@
-import { Injectable, NestMiddleware } from "@nestjs/common";
-import { randomUUID } from "crypto";
-import { CorrelationIdService } from "./correlation-id.service";
-import { CORRELATION_ID_HEADER } from "./correlation-id.constants";
+import { Injectable, NestMiddleware } from '@nestjs/common';
+import { randomUUID } from 'crypto';
+import { CorrelationIdService } from './correlation-id.service';
+import { CORRELATION_ID_HEADER } from './correlation-id.constants';
 
 @Injectable()
 export class CorrelationIdMiddleware implements NestMiddleware {

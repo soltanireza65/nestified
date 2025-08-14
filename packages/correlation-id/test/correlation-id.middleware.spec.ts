@@ -1,74 +1,72 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { Test } from '@nestjs/testing';
-import {
-  CorrelationIdMiddleware,
-  CorrelationIdService,
-  CORRELATION_ID_MODULE_OPTIONS,
-  CorrelationIdModule,
-} from '../src';
-import { createTestingModule } from './setup';
-import { Request, Response } from 'express';
+// import { beforeEach, describe, expect, it, vi } from 'vitest';
+// import { Test } from '@nestjs/testing';
+// import {
+//   CorrelationIdMiddleware,
+//   CorrelationIdService,
+//   CORRELATION_ID_HEADER,
+// } from '../src';
+// import { createTestingModule } from './setup';
 
-describe('CorrelationIdMiddleware', () => {
-  let middleware: CorrelationIdMiddleware;
+// // Mock crypto.randomUUID
+// vi.mock('crypto', () => ({
+//   randomUUID: vi.fn().mockReturnValue('mocked-uuid'),
+// }));
 
-  beforeEach(async () => {
-    const module = await createTestingModule();
-    middleware = module.get(CorrelationIdMiddleware);
-  });
+// describe('CorrelationIdMiddleware', () => {
+//   let middleware: CorrelationIdMiddleware;
+//   let service: CorrelationIdService;
 
-  // it('should add correlation ID to request and response', async () => {
-  //   const req = { get: vi.fn().mockReturnValue(undefined) } as any as Request;
-  //   const res = { setHeader: vi.fn() } as any as Response;
-  //   const next = vi.fn();
+//   beforeEach(async () => {
+//     const module = await createTestingModule();
+//     middleware = module.get(CorrelationIdMiddleware);
+//     service = module.get(CorrelationIdService);
+//   });
 
-  //   await middleware.use(req, res, next);
+//   it('should set correlation ID from incoming header', async () => {
+//     const correlationId = 'test-id';
+//     const req = { headers: { [CORRELATION_ID_HEADER]: correlationId } } as any;
+//     const res = { setHeader: vi.fn() } as any;
+//     const next = vi.fn();
 
-  //   expect(req.correlationId).toBeDefined();
-  //   expect(res.setHeader).toHaveBeenCalledWith(
-  //     'X-Correlation-Id',
-  //     expect.any(String),
-  //   );
-  //   expect(next).toHaveBeenCalled();
-  // });
+//     await middleware.use(req, res, next);
 
-  // it('should use existing correlation ID from header', async () => {
-  //   const correlationId = 'test-id';
-  //   const req = {
-  //     get: vi.fn().mockReturnValue(correlationId),
-  //   } as any as Request;
-  //   const res = { setHeader: vi.fn() } as any as Response;
-  //   const next = vi.fn();
+//     expect(res.setHeader).toHaveBeenCalledWith(
+//       CORRELATION_ID_HEADER,
+//       correlationId,
+//     );
+//     expect(next).toHaveBeenCalled();
+//     expect(service.get()).toBe(correlationId);
+//   });
 
-  //   await middleware.use(req, res, next);
+//   it('should generate new correlation ID if none provided', async () => {
+//     const req = { headers: {} } as any;
+//     const res = { setHeader: vi.fn() } as any;
+//     const next = vi.fn();
 
-  //   expect(req.correlationId).toBe(correlationId);
-  //   expect(res.setHeader).not.toHaveBeenCalled();
-  //   expect(next).toHaveBeenCalled();
-  // });
+//     await middleware.use(req, res, next);
 
-  // it('should use custom header from options', async () => {
-  //   const customHeader = 'X-Custom-Id';
-  //   const module = await Test.createTestingModule({
-  //     imports: [
-  //       CorrelationIdModule.forRoot({
-  //         header: customHeader,
-  //       }),
-  //     ],
-  //   }).compile();
+//     expect(res.setHeader).toHaveBeenCalledWith(
+//       CORRELATION_ID_HEADER,
+//       'mocked-uuid',
+//     );
+//     expect(next).toHaveBeenCalled();
+//     expect(service.get()).toBe('mocked-uuid');
+//   });
 
-  //   const middleware = module.get(CorrelationIdMiddleware);
-  //   const req = { get: vi.fn().mockReturnValue(undefined) } as any as Request;
-  //   const res = { setHeader: vi.fn() } as any as Response;
-  //   const next = vi.fn();
+//   it('should maintain correlation ID in async context', async () => {
+//     const correlationId = 'test-id';
+//     const req = { headers: { [CORRELATION_ID_HEADER]: correlationId } } as any;
+//     const res = { setHeader: vi.fn() } as any;
+//     const next = vi.fn();
 
-  //   await middleware.use(req, res, next);
+//     await middleware.use(req, res, next);
 
-  //   expect(req.correlationId).toBeDefined();
-  //   expect(res.setHeader).toHaveBeenCalledWith(
-  //     customHeader,
-  //     expect.any(String),
-  //   );
-  //   expect(next).toHaveBeenCalled();
-  // });
-});
+//     let contextId: string | undefined;
+//     service.run(correlationId, () => {
+//       contextId = service.get();
+//     });
+
+//     expect(contextId).toBe(correlationId);
+//     expect(service.get()).toBe(correlationId); // Middleware context persists
+//   });
+// });
