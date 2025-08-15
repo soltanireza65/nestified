@@ -190,9 +190,3 @@ pnpm test
 ## 📄 License
 
 MIT © 2025 — Nestified
-
----
-
-I can also create a **small diagram showing HTTP → Service → RPC correlation propagation** to make this section more visual and easier to understand.
-
-Do you want me to add that diagram?
