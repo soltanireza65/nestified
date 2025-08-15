@@ -28,8 +28,8 @@ importers:
   examples/correlation-id-example:
     dependencies:
       '@nestified/correlation-id':
-        specifier: ^1.0.0
-        version: 1.0.0(@nestjs/core@11.1.6(@nestjs/common@11.1.6(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/microservices@11.1.6)(@nestjs/platform-express@11.1.6)(reflect-metadata@0.2.2)(rxjs@7.8.2))(reflect-metadata@0.2.2)
+        specifier: '*'
+        version: 1.0.0-dev.0(@nestjs/core@11.1.6(@nestjs/common@11.1.6(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/microservices@11.1.6)(@nestjs/platform-express@11.1.6)(reflect-metadata@0.2.2)(rxjs@7.8.2))(reflect-metadata@0.2.2)
       '@nestjs/common':
         specifier: ^11.1.6
         version: 11.1.6(reflect-metadata@0.2.2)(rxjs@7.8.2)
@@ -904,8 +904,8 @@ packages:
   '@napi-rs/wasm-runtime@0.2.12':
     resolution: {integrity: sha512-ZVWUcfwY4E/yPitQJl481FjFo3K22D6qF0DuFH6Y/nbnE11GY5uguDxZMGXPQ8WQ0128MXQD7TnfHyK4oWoIJQ==}
 
-  '@nestified/correlation-id@1.0.0':
-    resolution: {integrity: sha512-F2c0isTTDARMo+HOLYsa8T/aqkRGjfXieMbi47kgxvqQR3Y0wbcTFAYV44Vy0PK53+X4lCKawNk6X2/yQVrHUA==}
+  '@nestified/correlation-id@1.0.0-dev.0':
+    resolution: {integrity: sha512-RIZ5B1EdAayN42oMXKf3oRj2Cc5gJ/EEqlSpWkOK+++94jQfYd5edjEKpqjoNFMYzEAy+XUm3q90+2F5H7G+/w==}
     peerDependencies:
       '@nestjs/core': ^10.0.0
 
@@ -4831,7 +4831,7 @@ snapshots:
       '@tybys/wasm-util': 0.10.0
     optional: true
 
-  '@nestified/correlation-id@1.0.0(@nestjs/core@11.1.6(@nestjs/common@11.1.6(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/microservices@11.1.6)(@nestjs/platform-express@11.1.6)(reflect-metadata@0.2.2)(rxjs@7.8.2))(reflect-metadata@0.2.2)':
+  '@nestified/correlation-id@1.0.0-dev.0(@nestjs/core@11.1.6(@nestjs/common@11.1.6(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/microservices@11.1.6)(@nestjs/platform-express@11.1.6)(reflect-metadata@0.2.2)(rxjs@7.8.2))(reflect-metadata@0.2.2)':
     dependencies:
       '@nestjs/common': 11.1.6(reflect-metadata@0.2.2)(rxjs@7.8.2)
       '@nestjs/core': 11.1.6(@nestjs/common@11.1.6(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/microservices@11.1.6)(@nestjs/platform-express@11.1.6)(reflect-metadata@0.2.2)(rxjs@7.8.2)
