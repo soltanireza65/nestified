@@ -6,6 +6,7 @@
       "cache": true,
       "dependsOn": ["^build", "clean"]
     },
+    "publish": {},
     "clean": {},
     "test": {},
     "lint": {

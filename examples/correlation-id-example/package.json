@@ -14,7 +14,7 @@
     "debug": "nest start --debug --watch"
   },
   "dependencies": {
-    "@nestified/correlation-id": "workspace:*",
+    "@nestified/correlation-id": "^1.0.0",
     "@nestjs/common": "^11.1.6",
     "@nestjs/core": "^11.1.6",
     "@nestjs/microservices": "^11.1.6",
