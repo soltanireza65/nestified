@@ -1,3 +1,8 @@
+Here’s a **clean, professional `README.md`** you can drop into the root of your `nestified` monorepo.
+It’s structured so it works for **future packages** as well, not just `correlation-id` and `centralized-logger`.
+
+---
+
 ````markdown
 # Nestified
 
