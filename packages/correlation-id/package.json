@@ -1,6 +1,6 @@
 {
   "name": "@nestified/correlation-id",
-  "version": "1.0.0",
+  "version": "1.0.1-dev.0",
   "private": false,
   "description": "A NestJS package for adding correlation IDs to requests for tracking and logging",
   "main": "dist/index.js",
@@ -12,7 +12,9 @@
     "dev": "tsc --watch",
     "build": "tsc -p tsconfig.build.json",
     "clean": "rimraf dist",
+    "prerelease": "pnpm version prerelease --preid=dev",
     "publish": "pnpm publish --access public --no-git-checks",
+    "publish:dev": "pnpm publish --tag dev --access public --no-git-checks",
     "test": "vitest",
     "test:watch": "vitest",
     "prepublishOnly": "npm run build"
