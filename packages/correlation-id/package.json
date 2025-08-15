@@ -1,6 +1,7 @@
 {
   "name": "@nestified/correlation-id",
   "version": "1.0.0",
+  "private": false,
   "description": "A NestJS package for adding correlation IDs to requests for tracking and logging",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -8,10 +9,11 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsc",
-    "test": "vitest run",
+    "dev": "tsc --watch",
+    "build": "tsc -p tsconfig.build.json",
+    "publish": "npm publish --access public",
+    "test": "vitest",
     "test:watch": "vitest",
-    "lint": "eslint src --ext .ts",
     "prepublishOnly": "npm run build"
   },
   "keywords": [
@@ -20,21 +22,23 @@
     "request-tracking",
     "logging"
   ],
-  "author": "Your Name",
+  "author": "Reza Soltani",
   "license": "MIT",
   "dependencies": {
-    "@nestjs/common": "^10.0.0",
+    "@nestjs/common": "^11.1.6",
+    "@nestjs/microservices": "^11.1.6",
     "@types/express": "^5.0.3",
-    "express": "^5.1.0"
+    "express": "^5.1.0",
+    "rxjs": "^7.8.2"
   },
   "devDependencies": {
-    "@nestjs/testing": "^10.0.0",
-    "@types/node": "^20.14.10",
-    "@typescript-eslint/eslint-plugin": "^7.16.0",
-    "@typescript-eslint/parser": "^7.16.0",
-    "eslint": "^8.57.0",
-    "typescript": "^5.5.3",
-    "vitest": "^2.0.5"
+    "@nestjs/testing": "^11.1.6",
+    "@types/node": "^24.2.1",
+    "@typescript-eslint/eslint-plugin": "^8.39.1",
+    "@typescript-eslint/parser": "^8.39.1",
+    "eslint": "^9.33.0",
+    "typescript": "^5.9.2",
+    "vitest": "^3.2.4"
   },
   "peerDependencies": {
     "@nestjs/core": "^10.0.0"

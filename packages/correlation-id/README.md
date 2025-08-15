@@ -1,11 +1,6 @@
-Here’s a **basic but professional documentation draft** for your `@nestified/correlation-id` package.
-It follows a structure similar to popular NestJS packages so it looks familiar to developers.
-
----
-
 # `@nestified/correlation-id`
 
-A lightweight, framework-agnostic **Correlation ID** utility for NestJS that ensures every incoming request (HTTP, WebSocket, RPC) has a unique identifier for distributed tracing and logging.
+A lightweight **Correlation ID** utility for NestJS that ensures every incoming request (HTTP, WebSocket, RPC) has a unique identifier for distributed tracing and logging.
 
 ---
 
@@ -41,11 +36,45 @@ import { Module } from '@nestjs/common';
 import { CorrelationIdModule } from '@nestified/correlation-id';
 
 @Module({
-  imports: [
-    CorrelationIdModule.forRoot({
-      headerName: 'x-correlation-id', // optional, default is x-correlation-id
-      generate: true, // automatically generate if not provided
-    }),
+  imports: [CorrelationIdModule],
+})
+export class AppModule {}
+```
+
+---
+
+## 🌐 Provide Middleware in Gateway Apps
+
+For gateway applications (e.g., HTTP-based), apply the `CorrelationIdMiddleware` globally:
+
+```ts
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
+import { CorrelationIdMiddleware } from '@nestified/correlation-id';
+
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(CorrelationIdMiddleware).forRoutes('*');
+  }
+}
+```
+
+---
+
+## 🧩 Provide Interceptor in RPC (Microservice) Apps
+
+For transport-based microservices, register the `CorrelationIdInterceptor` globally using the `APP_INTERCEPTOR` token:
+
+```ts
+import { Module } from '@nestjs/common';
+import { APP_INTERCEPTOR } from '@nestjs/core';
+import { CorrelationIdInterceptor } from '@nestified/correlation-id';
+
+@Module({
+  providers: [
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: CorrelationIdInterceptor,
+    },
   ],
 })
 export class AppModule {}
@@ -66,7 +95,7 @@ export class AppService {
   constructor(private readonly correlationIdService: CorrelationIdService) {}
 
   getHello(): string {
-    const correlationId = this.correlationIdService.getId();
+    const correlationId = this.correlationIdService.get();
     return `Correlation ID: ${correlationId}`;
   }
 }
@@ -87,20 +116,10 @@ export class MyLogger {
   constructor(private readonly correlationIdService: CorrelationIdService) {}
 
   log(message: string) {
-    this.logger.log(`[${this.correlationIdService.getId()}] ${message}`);
+    this.logger.log(`[${this.correlationIdService.get()}] ${message}`);
   }
 }
 ```
-
----
-
-## ⚙️ Configuration Options
-
-| Option        | Type      | Default            | Description                                         |
-| ------------- | --------- | ------------------ | --------------------------------------------------- |
-| `headerName`  | `string`  | `x-correlation-id` | The HTTP header key to use for correlation IDs      |
-| `generate`    | `boolean` | `true`             | Whether to generate a new correlation ID if missing |
-| `uuidVersion` | `4 \| 1`  | `4`                | UUID version for generation                         |
 
 ---
 
@@ -120,6 +139,44 @@ client.send('my-pattern', payload, {
 
 ---
 
+### Using `AbstractRpcClient` for RPC Clients
+
+The `AbstractRpcClient` class helps propagate correlation IDs automatically for all outgoing RPC requests or events.
+
+```ts
+import { Injectable } from '@nestjs/common';
+import { ClientProxy } from '@nestjs/microservices';
+import {
+  CorrelationIdService,
+  AbstractRpcClient,
+} from '@nestified/correlation-id';
+
+@Injectable()
+export class MyRpcClient extends AbstractRpcClient {
+  constructor(client: ClientProxy, correlationIdService: CorrelationIdService) {
+    super(client, correlationIdService);
+  }
+
+  sendMessage(payload: any) {
+    return this.send('my-pattern', payload);
+  }
+
+  emitMessage(payload: any) {
+    return this.emit('my-pattern', payload);
+  }
+}
+```
+
+#### API
+
+- `buildPayload(payload)` – injects correlation ID into payload headers.
+- `send(pattern, payload)` – sends an RPC message with correlation ID.
+- `emit(pattern, payload)` – emits an event with correlation ID.
+
+This ensures **traceability across multiple microservices** without manually passing headers.
+
+---
+
 ## 🛠 Development
 
 ```bash
@@ -136,4 +193,6 @@ MIT © 2025 — Nestified
 
 ---
 
-If you want, I can also **add an architecture diagram** showing how the middleware, interceptor, and service interact in the request lifecycle so the package is easier to understand at a glance. That would make it look very professional.
+I can also create a **small diagram showing HTTP → Service → RPC correlation propagation** to make this section more visual and easier to understand.
+
+Do you want me to add that diagram?
