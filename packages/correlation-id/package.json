@@ -12,7 +12,7 @@
     "dev": "tsc --watch",
     "build": "tsc -p tsconfig.build.json",
     "clean": "rimraf dist",
-    "publish": "npm publish --access public",
+    "publish": "pnpm publish --access public --no-git-checks",
     "test": "vitest",
     "test:watch": "vitest",
     "prepublishOnly": "npm run build"
