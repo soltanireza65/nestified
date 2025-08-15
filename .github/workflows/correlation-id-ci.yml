@@ -35,6 +35,8 @@ jobs:
         run: pnpm test
 
       - name: "Publish"
-        run: pnpm publish --filter=@nestified/correlation-id
+        working-directory: "packages/correlation-id"
+        run: pnpm publish --tag dev --access public --no-git-checks
+        # run: pnpm publish:dev --filter=@nestified/correlation-id
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
