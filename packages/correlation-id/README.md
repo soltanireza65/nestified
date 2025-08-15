@@ -1,17 +1,16 @@
 # `@nestified/correlation-id`
 
-A lightweight **Correlation ID** utility for NestJS that ensures every incoming request (HTTP, WebSocket, RPC) has a unique identifier for distributed tracing and logging.
+**Automatic Correlation ID tracking for NestJS** — HTTP, RPC, and WebSocket ready.
 
 ---
 
-## ✨ Features
+## ✨ Why use it?
 
-- ✅ **Automatic Correlation ID generation** for each request
-- ✅ Works with **HTTP, RPC, and WebSocket** contexts
-- ✅ **Custom header key** support (default: `x-correlation-id`)
-- ✅ Built-in **NestJS middleware & interceptor** for easy integration
-- ✅ Compatible with **async context tracking** (using `AsyncLocalStorage`)
-- ✅ Minimal and framework-agnostic core
+- Automatically **generates** or **propagates** correlation IDs for every request.
+- Works with **HTTP**, **microservices (RPC)**, and **WebSockets**.
+- Fully compatible with **NestJS async context** (`AsyncLocalStorage`).
+- Minimal, framework-agnostic core — plug it into any architecture.
+- Drop-in **middleware** and **interceptor**.
 
 ---
 
@@ -29,28 +28,20 @@ yarn add @nestified/correlation-id
 
 ## 🚀 Quick Start
 
-### 1. Import the Module
+### 1. HTTP / API Gateways
+
+Register the middleware globally:
 
 ```ts
-import { Module } from '@nestjs/common';
-import { CorrelationIdModule } from '@nestified/correlation-id';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
+import {
+  CorrelationIdMiddleware,
+  CorrelationIdModule,
+} from '@nestified/correlation-id';
 
 @Module({
   imports: [CorrelationIdModule],
 })
-export class AppModule {}
-```
-
----
-
-## 🌐 Provide Middleware in Gateway Apps
-
-For gateway applications (e.g., HTTP-based), apply the `CorrelationIdMiddleware` globally:
-
-```ts
-import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
-import { CorrelationIdMiddleware } from '@nestified/correlation-id';
-
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
     consumer.apply(CorrelationIdMiddleware).forRoutes('*');
@@ -60,31 +51,28 @@ export class AppModule implements NestModule {
 
 ---
 
-## 🧩 Provide Interceptor in RPC (Microservice) Apps
+### 2. RPC / Microservices
 
-For transport-based microservices, register the `CorrelationIdInterceptor` globally using the `APP_INTERCEPTOR` token:
+Register the interceptor globally:
 
 ```ts
 import { Module } from '@nestjs/common';
 import { APP_INTERCEPTOR } from '@nestjs/core';
-import { CorrelationIdInterceptor } from '@nestified/correlation-id';
+import {
+  CorrelationIdInterceptor,
+  CorrelationIdModule,
+} from '@nestified/correlation-id';
 
 @Module({
-  providers: [
-    {
-      provide: APP_INTERCEPTOR,
-      useClass: CorrelationIdInterceptor,
-    },
-  ],
+  imports: [CorrelationIdModule],
+  providers: [{ provide: APP_INTERCEPTOR, useClass: CorrelationIdInterceptor }],
 })
 export class AppModule {}
 ```
 
 ---
 
-### 2. Use in Application
-
-#### Access the Correlation ID anywhere
+### 3. Access the Correlation ID Anywhere
 
 ```ts
 import { Injectable } from '@nestjs/common';
@@ -92,18 +80,19 @@ import { CorrelationIdService } from '@nestified/correlation-id';
 
 @Injectable()
 export class AppService {
-  constructor(private readonly correlationIdService: CorrelationIdService) {}
+  constructor(private readonly correlationId: CorrelationIdService) {}
 
-  getHello(): string {
-    const correlationId = this.correlationIdService.get();
-    return `Correlation ID: ${correlationId}`;
+  getHello() {
+    return `Correlation ID: ${this.correlationId.get()}`;
   }
 }
 ```
 
 ---
 
-### 3. Logging Example
+## 📋 Usage Examples
+
+### Logging with Correlation IDs
 
 ```ts
 import { Logger } from '@nestjs/common';
@@ -112,68 +101,49 @@ import { CorrelationIdService } from '@nestified/correlation-id';
 @Injectable()
 export class MyLogger {
   private readonly logger = new Logger(MyLogger.name);
-
-  constructor(private readonly correlationIdService: CorrelationIdService) {}
+  constructor(private readonly cid: CorrelationIdService) {}
 
   log(message: string) {
-    this.logger.log(`[${this.correlationIdService.get()}] ${message}`);
+    this.logger.log(`[${this.cid.get()}] ${message}`);
   }
 }
 ```
 
 ---
 
-## 🧩 Advanced Usage
-
-### Using with RPC or WebSocket
-
-The built-in interceptor extracts correlation IDs from RPC metadata or WebSocket handshake headers automatically.
-
-Example for manually setting in RPC client:
+### Propagating IDs in RPC Clients
 
 ```ts
-client.send('my-pattern', payload, {
-  headers: { 'x-correlation-id': 'my-id' },
-});
-```
-
----
-
-### Using `AbstractRpcClient` for RPC Clients
-
-The `AbstractRpcClient` class helps propagate correlation IDs automatically for all outgoing RPC requests or events.
-
-```ts
-import { Injectable } from '@nestjs/common';
+import { Injectable, Inject } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import {
-  CorrelationIdService,
   AbstractRpcClient,
+  CorrelationIdService,
 } from '@nestified/correlation-id';
 
 @Injectable()
 export class MyRpcClient extends AbstractRpcClient {
-  constructor(client: ClientProxy, correlationIdService: CorrelationIdService) {
-    super(client, correlationIdService);
-  }
-
-  sendMessage(payload: any) {
-    return this.send('my-pattern', payload);
-  }
-
-  emitMessage(payload: any) {
-    return this.emit('my-pattern', payload);
+  constructor(
+    @Inject('RPC_CLIENT') client: ClientProxy,
+    correlationId: CorrelationIdService,
+  ) {
+    super(client, correlationId);
   }
 }
+
+// Now every `send` or `emit` call will include x-correlation-id automatically
 ```
 
-#### API
+---
 
-- `buildPayload(payload)` – injects correlation ID into payload headers.
-- `send(pattern, payload)` – sends an RPC message with correlation ID.
-- `emit(pattern, payload)` – emits an event with correlation ID.
+## ⚙️ Advanced
 
-This ensures **traceability across multiple microservices** without manually passing headers.
+| Feature               | Description                                                                                             |
+| --------------------- | ------------------------------------------------------------------------------------------------------- |
+| **Custom header key** | Default is `x-correlation-id` — override in `CorrelationIdModule.forRoot({ headerName: 'my-header' })`. |
+| **RPC metadata**      | Extracts ID from `headers` in microservice payloads.                                                    |
+| **WebSocket support** | Reads from handshake headers.                                                                           |
+| **Manual setting**    | `correlationIdService.set('my-id')`.                                                                    |
 
 ---
 
