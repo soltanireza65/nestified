@@ -11,6 +11,7 @@
   "scripts": {
     "dev": "tsc --watch",
     "build": "tsc -p tsconfig.build.json",
+    "clean": "rimraf dist",
     "publish": "npm publish --access public",
     "test": "vitest",
     "test:watch": "vitest",
