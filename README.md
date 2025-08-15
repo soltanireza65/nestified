@@ -39,8 +39,8 @@ This repository is a **Turborepo** monorepo. Each package lives in `packages/` a
 
 ### Prerequisites
 
-- [Node.js](https://nodejs.org/) >= 18
-- [pnpm](https://pnpm.io/) >= 8 (recommended)
+- [Node.js](https://nodejs.org/) >= 22
+- [pnpm](https://pnpm.io/) >= 9 (recommended)
 
 ### Install dependencies
 
