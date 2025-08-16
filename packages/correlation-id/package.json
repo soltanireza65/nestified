@@ -1,6 +1,6 @@
 {
   "name": "@nestified/correlation-id",
-  "version": "1.0.0-dev.7",
+  "version": "1.0.0-dev.8",
   "private": false,
   "description": "A NestJS package for adding correlation IDs to requests for tracking and logging",
   "main": "dist/index.js",
