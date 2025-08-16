@@ -1,6 +1,6 @@
 {
   "name": "@nestified/correlation-id",
-  "version": "1.0.0-dev.6",
+  "version": "1.0.0-dev.7",
   "private": false,
   "description": "A NestJS package for adding correlation IDs to requests for tracking and logging",
   "main": "dist/index.js",
@@ -25,6 +25,15 @@
     "request-tracking",
     "logging"
   ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/soltanireza65/nestified.git",
+    "directory": "packages/correlation-id"
+  },
+  "homepage": "https://github.com/soltanireza65/nestified#readme",
+  "bugs": {
+    "url": "https://github.com/soltanireza65/nestified/issues"
+  },
   "author": "Reza Soltani",
   "license": "MIT",
   "devDependencies": {
