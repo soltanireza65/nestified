@@ -82,16 +82,6 @@ nestified/
 
 ---
 
-## 📜 Publishing a Package
-
-> You must be logged into npm with access to the `@nestified` organization.
-
-```bash
-cd packages/correlation-id
-npm version patch   # or minor / major
-npm publish --access public
-```
-
 ---
 
 ## 🤝 Contributing
@@ -107,12 +97,3 @@ npm publish --access public
 ## 📄 License
 
 This project is licensed under the [MIT License](./LICENSE).
-
----
-
-```
-
----
-
-If you want, I can now also **write a minimal `README.md` template** for each package inside `packages/*` so that `@nestified/correlation-id` and `@nestified/centralized-logger` each have their own docs ready for npm publishing. That way, your monorepo and npm pages will look professional from day 1.
-```
