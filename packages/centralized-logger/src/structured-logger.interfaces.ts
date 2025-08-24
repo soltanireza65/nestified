@@ -1,6 +1,6 @@
 export interface ILoggerOptions {
   serviceName: string;
-  injectCorrelationId: boolean;
+  injectCorrelationId?: boolean;
   environment?: 'development' | 'production' | 'staging';
   level?: 'info' | 'debug' | 'warn' | 'error';
   redactFields?: string[];
