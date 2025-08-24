@@ -1,6 +1,6 @@
 {
   "name": "@nestified/centralized-logger",
-  "version": "1.0.0-dev.3",
+  "version": "1.0.0",
   "private": false,
   "description": "A structured logging module for NestJS based on Winston with correlation IDs, redaction, and request interceptors.",
   "main": "dist/index.js",
