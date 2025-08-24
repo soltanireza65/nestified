@@ -1,155 +1,200 @@
-# `@nestified/correlation-id`
+# 📑 Structured Logger Module
 
-**Automatic Correlation ID tracking for NestJS** — HTTP, RPC, and WebSocket ready.
+A **production-ready logging module for NestJS** built on top of [Winston](https://github.com/winstonjs/winston).
+Features:
 
----
-
-## ✨ Why use it?
-
-- Automatically **injects** or **propagates** correlation IDs for every log.
+- ✅ **Global NestJS module** (`StructuredLoggerModule`)
+- ✅ Works across **HTTP, RPC, and WebSocket** with an interceptor
+- ✅ **Correlation ID** injection (via [`@nestified/correlation-id`](https://www.npmjs.com/package/@nestified/correlation-id))
+- ✅ **Redaction** of sensitive fields
+- ✅ **Console + File transports**
+- ✅ **Environment-aware formatting** (colorized in dev, JSON in prod)
 
 ---
 
 ## 📦 Installation
 
 ```bash
-npm install @nestified/correlation-id
+npm install @nestified/centralized-logger
 # or
-pnpm add @nestified/correlation-id
+pnpm add @nestified/centralized-logger
 # or
-yarn add @nestified/correlation-id
+yarn add @nestified/centralized-logger
 ```
 
 ---
 
-## 🚀 Quick Start
+## 🛠 Setup
 
-### 1. HTTP / API Gateways
-
-Register the middleware globally:
-
-```ts
-import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
-import {
-  CorrelationIdMiddleware,
-  CorrelationIdModule,
-} from '@nestified/correlation-id';
-
-@Module({
-  imports: [CorrelationIdModule],
-})
-export class AppModule implements NestModule {
-  configure(consumer: MiddlewareConsumer) {
-    consumer.apply(CorrelationIdMiddleware).forRoutes('*');
-  }
-}
-```
-
----
-
-### 2. RPC / Microservices
-
-Register the interceptor globally:
+Register the logger module in your root module:
 
 ```ts
 import { Module } from '@nestjs/common';
-import { APP_INTERCEPTOR } from '@nestjs/core';
-import {
-  CorrelationIdInterceptor,
-  CorrelationIdModule,
-} from '@nestified/correlation-id';
+import { StructuredLoggerModule } from './logger/structured-logger.module';
 
 @Module({
-  imports: [CorrelationIdModule],
-  providers: [{ provide: APP_INTERCEPTOR, useClass: CorrelationIdInterceptor }],
+  imports: [
+    StructuredLoggerModule.register({
+      serviceName: 'my-service',
+      injectCorrelationId: true, // install and setup @nestified/correlation-id
+      environment: process.env.NODE_ENV as
+        | 'development'
+        | 'production'
+        | 'staging',
+      level: 'info',
+      redactFields: ['password', 'token'],
+      logFilePath: './logs',
+    }),
+  ],
 })
 export class AppModule {}
 ```
 
+## 🚀 Use Logger in Bootstrap
+
+Enable the structured logger in your `main.ts` bootstrap file:
+
+```ts
+async function bootstrap() {
+  const app = await NestFactory.create(AppModule);
+
+  app.useLogger(app.get(StructuredLoggerService));
+
+  await app.listen(3000);
+}
+```
+
 ---
 
-### 3. Access the Correlation ID Anywhere
+## 🔌 Usage
+
+### Inject logger into any provider
 
 ```ts
 import { Injectable } from '@nestjs/common';
-import { CorrelationIdService } from '@nestified/correlation-id';
+import { StructuredLoggerService } from './logger/structured-logger.service';
 
 @Injectable()
-export class AppService {
-  constructor(private readonly correlationId: CorrelationIdService) {}
+export class UsersService {
+  constructor(private readonly logger: StructuredLoggerService) {}
 
-  getHello() {
-    return `Correlation ID: ${this.correlationId.get()}`;
+  getUser(id: string) {
+    this.logger.log(`Fetching user ${id}`, UsersService.name);
+    return { id, name: 'John Doe' };
   }
 }
 ```
 
----
-
-## 📋 Usage Examples
-
-### Logging with Correlation IDs
+### Logging methods
 
 ```ts
-import { Logger } from '@nestjs/common';
-import { CorrelationIdService } from '@nestified/correlation-id';
-
-@Injectable()
-export class MyLogger {
-  private readonly logger = new Logger(MyLogger.name);
-  constructor(private readonly cid: CorrelationIdService) {}
-
-  log(message: string) {
-    this.logger.log(`[${this.cid.get()}] ${message}`);
-  }
-}
+this.logger.log('hello world', 'MyContext');
+this.logger.error('something went wrong', 'stacktrace here', 'AuthService');
+this.logger.warn('deprecated method used', 'LegacyModule');
+this.logger.debug('payload received', 'WebhookService');
+this.logger.verbose('detailed debug info', 'JobProcessor');
 ```
 
 ---
 
-### Propagating IDs in RPC Clients
+## 🌐 Request Logging
+
+The `StructuredLoggerInterceptor` logs **incoming requests** and **responses** (HTTP, RPC, WS).
+Add it globally:
 
 ```ts
-import { Injectable, Inject } from '@nestjs/common';
-import { ClientProxy } from '@nestjs/microservices';
-import {
-  AbstractRpcClient,
-  CorrelationIdService,
-} from '@nestified/correlation-id';
+import { APP_INTERCEPTOR } from '@nestjs/core';
+import { StructuredLoggerInterceptor } from './logger/structured-logger.interceptor';
 
-@Injectable()
-export class MyRpcClient extends AbstractRpcClient {
-  constructor(
-    @Inject('RPC_CLIENT') client: ClientProxy,
-    correlationId: CorrelationIdService,
-  ) {
-    super(client, correlationId);
+@Module({
+  providers: [
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: StructuredLoggerInterceptor,
+    },
+  ],
+})
+export class AppModule {}
+```
+
+Example log (dev mode, console):
+
+```
+2025-08-24T11:00:00.000Z [info] [HTTP] [correlationId=1234]:
+[HTTP] GET /users - completed in 15ms
+```
+
+---
+
+## 🔒 Redaction
+
+Redacts sensitive fields in both **string messages** and **structured objects**.
+
+```ts
+redactFields: ['password', 'authorization'];
+```
+
+Output:
+
+```json
+{
+  "timestamp": "2025-08-24T11:00:00.000Z",
+  "level": "info",
+  "message": "User login",
+  "payload": {
+    "username": "john",
+    "password": "[REDACTED]"
   }
 }
-
-// Now every `send` or `emit` call will include x-correlation-id automatically
 ```
 
 ---
 
-## ⚙️ Advanced
+## 🧩 Options
 
-| Feature               | Description                                                                                             |
-| --------------------- | ------------------------------------------------------------------------------------------------------- |
-| **Custom header key** | Default is `x-correlation-id` — override in `CorrelationIdModule.forRoot({ headerName: 'my-header' })`. |
-| **RPC metadata**      | Extracts ID from `headers` in microservice payloads.                                                    |
-| **WebSocket support** | Reads from handshake headers.                                                                           |
-| **Manual setting**    | `correlationIdService.set('my-id')`.                                                                    |
+```ts
+export interface ILoggerOptions {
+  serviceName: string; // Name of the service (appears in logs)
+  injectCorrelationId: boolean; // Attach x-correlation-id automatically
+  environment?: 'development' | 'production' | 'staging';
+  level?: 'info' | 'debug' | 'warn' | 'error';
+  redactFields?: string[]; // Fields to redact from logs
+  logFilePath?: string; // Directory for log files
+}
+```
 
 ---
 
-## 🛠 Development
+## 📂 Log Files
 
-```bash
-pnpm install
-pnpm build
-pnpm test
+If `logFilePath` is set, Winston writes:
+
+- `combined.log` → all logs
+- `error.log` → only error logs
+
+Example:
+
 ```
+./logs/combined.log
+./logs/error.log
+```
+
+---
+
+## 📌 Correlation ID
+
+Requests get tagged with `x-correlation-id`.
+If not provided, a new one is generated.
+This helps trace logs across microservices.
+
+---
+
+## ✅ Summary
+
+- Import `StructuredLoggerModule` once (global).
+- Inject `StructuredLoggerService` wherever you need logs.
+- Use `StructuredLoggerInterceptor` for automatic request/response logging.
+- Logs are structured, redact sensitive fields, and include correlation IDs.
 
 ---
 
