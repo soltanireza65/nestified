@@ -23,21 +23,21 @@ export class StructuredLoggerInterceptor implements NestInterceptor {
     if (ctxType === 'http') {
       const req = context.switchToHttp().getRequest();
       method = `[HTTP] ${req.method} ${req.url}`;
-      payload = { body: req.body };
+      payload = { body: req.body ?? {} };
       metadata = { ip: req.ip, headers: req.headers };
     }
 
     if (ctxType === 'rpc') {
       const rpcCtx = context.switchToRpc();
       method = `[RPC] ${context.getHandler().name}`;
-      payload = { data: rpcCtx.getData() };
+      payload = { data: rpcCtx.getData() ?? {} };
       metadata = { pattern: rpcCtx.getContext() };
     }
 
     if (ctxType === 'ws') {
       const wsCtx = context.switchToWs();
       method = `[WS] ${context.getHandler().name}`;
-      payload = { data: wsCtx.getData() };
+      payload = { data: wsCtx.getData() ?? {} };
     }
 
     this.logger.log({

@@ -34,33 +34,15 @@ import { StructuredLoggerModule } from './logger/structured-logger.module';
 
 @Module({
   imports: [
-    StructuredLoggerModule.register({
-      serviceName: 'my-service',
-      injectCorrelationId: true, // install and setup @nestified/correlation-id
-      environment: process.env.NODE_ENV as
-        | 'development'
-        | 'production'
-        | 'staging',
-      level: 'info',
-      redactFields: ['password', 'token'],
-      logFilePath: 'logs',
-    }),
-    // OR
     StructuredLoggerModule.registerAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
         serviceName: configService.get('serviceName', 'serviceName'),
-        injectCorrelationId: true,
+        injectCorrelationId: true, // install and setup @nestified/correlation-id
         level: configService.get('LOG_LEVEL', 'info'),
         logDir: configService.get('LOG_DIR'),
         environment: configService.get('ENV', 'development'),
-        redactFields: [
-          'password',
-          'authorization',
-          'access-token',
-          'refresh-token',
-          'api-key',
-        ],
+        redactFields: ['password', 'authorization'],
       }),
       inject: [ConfigService],
     }),
@@ -91,14 +73,13 @@ async function bootstrap() {
 
 ```ts
 import { Injectable } from '@nestjs/common';
-import { StructuredLoggerService } from './logger/structured-logger.service';
 
 @Injectable()
 export class UsersService {
-  constructor(private readonly logger: StructuredLoggerService) {}
+  constructor(private readonly logger: Logger) {}
 
   getUser(id: string) {
-    this.logger.log(`Fetching user ${id}`, UsersService.name);
+    this.logger.log(`Fetching user ${id}`, UsersService.name); // now you're using StructuredLoggerService
     return { id, name: 'John Doe' };
   }
 }
@@ -116,31 +97,61 @@ this.logger.verbose('detailed debug info', 'JobProcessor');
 
 ---
 
-## 🌐 Request Logging
+## 🌐 Request/Response Logging
 
-The `StructuredLoggerInterceptor` logs **incoming requests** and **responses** (HTTP, RPC, WS).
-Add it globally:
+`StructuredLoggerInterceptor` automatically logs incoming requests and responses for **HTTP, RPC, and WS**.
 
-```ts
-import { APP_INTERCEPTOR } from '@nestjs/core';
-import { StructuredLoggerInterceptor } from './logger/structured-logger.interceptor';
+````
 
-@Module({
-  providers: [
-    {
-      provide: APP_INTERCEPTOR,
-      useClass: StructuredLoggerInterceptor,
+Example log (production mode):
+
+```json
+{
+  "context": "StructuredLoggerInterceptor",
+  "correlationId": "b186776f-8d68-4745-b5b2-4b711d4ddfe3",
+  "level": "info",
+  "message": {
+    "context": "HTTP",
+    "message": "[HTTP] GET / - incoming",
+    "metadata": {
+      "headers": {
+        "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,_/_;q=0.8",
+        "accept-encoding": "gzip, deflate, br, zstd",
+        "accept-language": "en-US,en;q=0.5",
+        "connection": "keep-alive",
+        "host": "localhost:8000",
+        "if-none-match": "W/\"38-EkWGXeI7T6OCd6tPcOz4ZqERshw\"",
+        "priority": "u=0, i",
+        "sec-fetch-dest": "document",
+        "sec-fetch-mode": "navigate",
+        "sec-fetch-site": "none",
+        "sec-fetch-user": "?1",
+        "upgrade-insecure-requests": "1",
+        "user-agent": "Mozilla/5.0 (X11; Linux x86_64; rv:141.0) Gecko/20100101 Firefox/141.0"
+      },
+      "ip": "::ffff:127.0.0.1"
     },
-  ],
-})
-export class AppModule {}
-```
+    "payload": {}
+  },
+  "service": "my-service",
+  "timestamp": "2025-08-24T12:23:18.007Z"
+}
 
-Example log (dev mode, console):
+````
 
-```
-2025-08-24T11:00:00.000Z [info] [HTTP] [correlationId=1234]:
-[HTTP] GET /users - completed in 15ms
+```json
+{
+  "context": "StructuredLoggerInterceptor",
+  "correlationId": "b186776f-8d68-4745-b5b2-4b711d4ddfe3",
+  "level": "info",
+  "message": {
+    "context": "HTTP",
+    "message": "[HTTP] GET / - completed in 0ms",
+    "response": { "PING": "PONG" }
+  },
+  "service": "my-service",
+  "timestamp": "2025-08-24T12:23:18.007Z"
+}
 ```
 
 ---
@@ -173,12 +184,12 @@ Output:
 
 ```ts
 export interface ILoggerOptions {
-  serviceName: string; // Name of the service (appears in logs)
-  injectCorrelationId: boolean; // Attach x-correlation-id automatically
+  serviceName: string;
+  injectCorrelationId: boolean;
   environment?: 'development' | 'production' | 'staging';
   level?: 'info' | 'debug' | 'warn' | 'error';
-  redactFields?: string[]; // Fields to redact from logs
-  logFilePath?: string; // Directory for log files
+  redactFields?: string[];
+  logDir?: string;
 }
 ```
 
@@ -186,34 +197,19 @@ export interface ILoggerOptions {
 
 ## 📂 Log Files
 
-If `logFilePath` is set, Winston writes:
+When `logDir` is set:
 
 - `combined.log` → all logs
-- `error.log` → only error logs
-
-Example:
-
-```
-./logs/combined.log
-./logs/error.log
-```
-
----
-
-## 📌 Correlation ID
-
-Requests get tagged with `x-correlation-id`.
-If not provided, a new one is generated.
-This helps trace logs across microservices.
+- `error.log` → error logs only
 
 ---
 
 ## ✅ Summary
 
 - Import `StructuredLoggerModule` once (global).
-- Inject `StructuredLoggerService` wherever you need logs.
-- Use `StructuredLoggerInterceptor` for automatic request/response logging.
-- Logs are structured, redact sensitive fields, and include correlation IDs.
+- Inject `Logger` wherever you need it.
+- Request/response logging is automatic with the interceptor.
+- Logs are structured, redact sensitive data, and include correlation IDs.
 
 ---
 
