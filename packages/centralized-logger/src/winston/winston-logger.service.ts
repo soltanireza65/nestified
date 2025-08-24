@@ -13,6 +13,7 @@ import {
 @Injectable()
 export class WinstonStructuredLoggerService implements StructuredLoggerService {
   private readonly logger: WinstonLogger;
+
   constructor(
     @Inject(MODULE_OPTIONS_TOKEN)
     private readonly options: ILoggerOptions,
@@ -71,24 +72,24 @@ export class WinstonStructuredLoggerService implements StructuredLoggerService {
     return logger;
   }
 
-  log(message: messageType, context?: string) {
-    this.logger.info(JSON.stringify(message), { context });
+  log(message: string, context?: string) {
+    this.logger.info(message, { context });
   }
 
-  error(message: messageType, trace?: string, context?: string) {
-    this.logger.error(JSON.stringify(message), { trace, context });
+  error(message: string, trace?: string, context?: string) {
+    this.logger.error(message, { trace, context });
   }
 
-  warn(message: messageType, context?: string) {
-    this.logger.warn(JSON.stringify(message), { context });
+  warn(message: string, context?: string) {
+    this.logger.warn(message, { context });
   }
 
-  debug(message: messageType, context?: string) {
-    this.logger.debug(JSON.stringify(message), { context });
+  debug(message: string, context?: string) {
+    this.logger.debug(message, { context });
   }
 
-  verbose(message: messageType, context?: string) {
-    this.logger.verbose(JSON.stringify(message), { context });
+  verbose(message: string, context?: string) {
+    this.logger.verbose(message, { context });
   }
 
   setLevel(level: 'info' | 'debug' | 'warn' | 'error') {
