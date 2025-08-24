@@ -30,10 +30,7 @@ export class TestController {
     StructuredLoggerModule.register({
       serviceName: 'my-service',
       injectCorrelationId: true, // install and setup @nestified/correlation-id
-      environment: process.env.NODE_ENV as
-        | 'development'
-        | 'production'
-        | 'staging',
+      environment: 'production',
       level: 'info',
       redactFields: ['password', 'token'],
       logDir: 'logs',
