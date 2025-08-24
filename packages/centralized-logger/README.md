@@ -43,7 +43,26 @@ import { StructuredLoggerModule } from './logger/structured-logger.module';
         | 'staging',
       level: 'info',
       redactFields: ['password', 'token'],
-      logFilePath: './logs',
+      logFilePath: 'logs',
+    }),
+    // OR
+    StructuredLoggerModule.registerAsync({
+      imports: [ConfigModule],
+      useFactory: async (configService: ConfigService) => ({
+        serviceName: configService.get('serviceName', 'serviceName'),
+        injectCorrelationId: true,
+        level: configService.get('LOG_LEVEL', 'info'),
+        logDir: configService.get('LOG_DIR'),
+        environment: configService.get('ENV', 'development'),
+        redactFields: [
+          'password',
+          'authorization',
+          'access-token',
+          'refresh-token',
+          'api-key',
+        ],
+      }),
+      inject: [ConfigService],
     }),
   ],
 })
