@@ -1,15 +1,17 @@
-import { APP_INTERCEPTOR, NestFactory } from '@nestjs/core';
-import { Controller, Get } from '@nestjs/common';
-import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
+import { StructuredLoggerModule } from '@nestified/centralized-logger';
 import {
-  CorrelationIdInterceptor,
   CorrelationIdMiddleware,
   CorrelationIdModule,
   CorrelationIdService,
 } from '@nestified/correlation-id';
+import {
+  Controller,
+  Get,
+  MiddlewareConsumer,
+  Module,
+  NestModule,
+} from '@nestjs/common';
 import { MessagePattern } from '@nestjs/microservices';
-import { StructuredLoggerModule } from '@nestified/centralized-logger';
-import { ConfigService } from '@nestjs/config';
 
 @Controller()
 export class TestController {
@@ -25,21 +27,16 @@ export class TestController {
 @Module({
   imports: [
     CorrelationIdModule,
-    StructuredLoggerModule.registerAsync({
-      useFactory: async (configService: ConfigService) => ({
-        serviceName: configService.getOrThrow('APP'),
-        level: configService.getOrThrow('LOG_LEVEL', 'info'),
-        logDir: configService.get('LOG_DIR'),
-        environment: configService.get('ENV', 'development'),
-        redactFields: [
-          'password',
-          'authorization',
-          'access-token',
-          'refresh-token',
-          'api-key',
-        ],
-      }),
-      inject: [ConfigService],
+    StructuredLoggerModule.register({
+      serviceName: 'my-service',
+      injectCorrelationId: true, // install and setup @nestified/correlation-id
+      environment: process.env.NODE_ENV as
+        | 'development'
+        | 'production'
+        | 'staging',
+      level: 'info',
+      redactFields: ['password', 'token'],
+      logDir: 'logs',
     }),
   ],
   controllers: [TestController],
