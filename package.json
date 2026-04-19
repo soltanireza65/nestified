@@ -12,16 +12,16 @@
     "check-types": "turbo run check-types"
   },
   "devDependencies": {
-    "turbo": "^2.5.5",
-    "prettier": "^3.6.2",
-    "@types/node": "^24.3.0",
-    "typescript": "5.9.2"
+    "turbo": "^2.9.6",
+    "prettier": "^3.8.3",
+    "@types/node": "^25.6.0",
+    "typescript": "6.0.2"
   },
-  "packageManager": "pnpm@9.0.0",
+  "packageManager": "pnpm@10.33.0",
   "engines": {
     "node": ">=18"
   },
   "dependencies": {
-    "rimraf": "^6.0.1"
+    "rimraf": "^6.1.3"
   }
 }
